@@ -1,0 +1,48 @@
+name: Build Test and Containerize
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  build-test-container:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+
+      - name: Install dependencies
+        run: python -m pip install -r requirements.txt
+
+      - name: Run unit tests
+        run: python -m pytest -q
+
+      - name: Build Docker image
+        run: docker build --tag aceest-fitness-devops:${{ github.sha }} .
+
+      - name: Run container smoke test
+        run: |
+          docker run --detach --rm --name aceest-smoke --publish 5099:5000 aceest-fitness-devops:${{ github.sha }}
+          python - <<'PY'
+          import time
+          import urllib.request
+          for _ in range(20):
+              try:
+                  if urllib.request.urlopen('http://127.0.0.1:5099/healthz').status == 200:
+                      break
+              except Exception:
+                  time.sleep(1)
+          else:
+              raise SystemExit('container health check failed')
+          PY
+          docker stop aceest-smoke
+

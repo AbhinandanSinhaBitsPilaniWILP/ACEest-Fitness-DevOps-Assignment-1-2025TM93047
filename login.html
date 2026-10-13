@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ACEest Fitness Login</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body class="login-page">
+  <main class="login-card">
+    <p class="eyebrow">ACEest Fitness &amp; Gym</p>
+    <h1>DevOps fitness management</h1>
+    <p class="muted">Sign in to manage clients, programs and workouts.</p>
+    {% if error %}<p class="error">{{ error }}</p>{% endif %}
+    <form method="post">
+      <label>Username<input name="username" required autofocus></label>
+      <label>Password<input name="password" type="password" required></label>
+      <button type="submit">Sign in</button>
+    </form>
+    <p class="demo-note">Local demo credentials are documented in the README.</p>
+  </main>
+</body>
+</html>
+

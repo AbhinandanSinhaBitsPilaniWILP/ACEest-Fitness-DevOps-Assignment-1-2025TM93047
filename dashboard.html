@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ACEest Fitness Dashboard</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <header class="topbar">
+    <div><span class="eyebrow">ACEest Fitness &amp; Gym</span><h1>Operations dashboard</h1></div>
+    <a class="button secondary" href="{{ url_for('logout') }}">Sign out</a>
+  </header>
+  <main class="page-grid">
+    <section class="panel">
+      <div class="panel-heading"><div><p class="eyebrow">Client registry</p><h2>Clients</h2></div><span class="count">{{ clients|length }}</span></div>
+      <form class="compact-form" method="post" action="{{ url_for('create_client') }}">
+        <label>Name<input name="name" placeholder="e.g. Priya Shah" required></label>
+        <div class="two-col"><label>Age<input name="age" type="number" min="1"></label><label>Weight kg<input name="weight" type="number" step="0.1" min="0"></label></div>
+        <button type="submit">Add client</button>
+      </form>
+      <div class="client-list">
+        {% for client in clients %}
+        <article class="client-card">
+          <div><h3>{{ client['name'] }}</h3><p class="muted">{{ client['membership_status'] }}{% if client['program'] %} · {{ client['program'] }}{% endif %}</p></div>
+          <div class="inline-actions">
+            <form method="post" action="{{ url_for('generate_program', client_id=client['id']) }}"><input type="hidden" name="program_type" value="Beginner"><button class="small" type="submit">Generate program</button></form>
+            <form method="post" action="{{ url_for('add_workout', client_id=client['id']) }}"><input type="hidden" name="workout_type" value="Strength"><input type="hidden" name="duration_min" value="45"><button class="small secondary" type="submit">Log workout</button></form>
+          </div>
+        </article>
+        {% else %}<p class="muted empty">No clients yet. Add the first client above.</p>{% endfor %}
+      </div>
+    </section>
+    <section class="panel highlight">
+      <p class="eyebrow">Pipeline target</p>
+      <h2>Build once, validate everywhere</h2>
+      <p>The application is tested with Pytest, packaged with Docker, and validated by both Jenkins and GitHub Actions.</p>
+      <dl class="facts"><div><dt>Health endpoint</dt><dd><a href="{{ url_for('healthz') }}">/healthz</a></dd></div><div><dt>Database</dt><dd>SQLite</dd></div><div><dt>CI trigger</dt><dd>Push and pull request</dd></div></dl>
+    </section>
+  </main>
+</body>
+</html>
+
